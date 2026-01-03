@@ -29,6 +29,11 @@ import { User } from '../../../models/user.model';
               <a mat-button routerLink="/manager/dashboard" routerLinkActive="active">Dashboard</a>
               <a mat-button routerLink="/manager/tables" routerLinkActive="active">Manage Tables</a>
             </ng-container>
+
+            <ng-container *ngIf="currentUser.role === 'admin'">
+              <a mat-button routerLink="/admin/dashboard" routerLinkActive="active">Analytics</a>
+              <a mat-button routerLink="/admin/users" routerLinkActive="active">Users</a>
+            </ng-container>
           </div>
         </div>
         

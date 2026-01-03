@@ -55,12 +55,13 @@ import { AuthService } from '../../../services/auth.service';
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Register As</mat-label>
-            <mat-select [(ngModel)]="role" name="role" required>
-              <mat-option value="customer">Customer</mat-option>
-              <mat-option value="manager">Manager</mat-option>
-            </mat-select>
-          </mat-form-field>
+  <mat-label>Register As</mat-label>
+  <mat-select [(ngModel)]="role" name="role" required>
+    <mat-option value="customer">Customer</mat-option>
+    <mat-option value="manager">Manager</mat-option>
+    <mat-option value="admin">Admin</mat-option>
+  </mat-select>
+</mat-form-field>
 
           <button mat-raised-button color="primary" type="submit" class="full-width submit-btn">
             Register

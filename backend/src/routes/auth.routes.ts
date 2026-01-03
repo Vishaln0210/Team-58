@@ -16,7 +16,7 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ success: false, message: 'All fields are required' });
     }
 
-    if (!['customer', 'manager'].includes(role)) {
+    if (!['customer', 'manager', 'admin'].includes(role)) {
       return res.status(400).json({ success: false, message: 'Invalid role' });
     }
 

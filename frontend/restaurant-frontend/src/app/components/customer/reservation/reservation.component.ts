@@ -8,6 +8,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+
 import { NavbarComponent } from '../../shared/navbar/navbar.component';
 import { ReservationService } from '../../../services/reservation.service';
 import { Reservation } from '../../../models/user.model';
@@ -25,11 +28,13 @@ import { Reservation } from '../../../models/user.model';
     MatSelectModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     NavbarComponent
   ],
   template: `
     <app-navbar></app-navbar>
-    
+
     <div class="page-container">
       <div class="page-header">
         <h1>Reservations</h1>
@@ -44,7 +49,7 @@ import { Reservation } from '../../../models/user.model';
         <!-- My Reservations -->
         <mat-card class="reservations-card">
           <h2>My Reservations</h2>
-          
+
           <div class="empty-state" *ngIf="reservations.length === 0">
             <p>No reservations yet</p>
           </div>
@@ -67,16 +72,35 @@ import { Reservation } from '../../../models/user.model';
         <!-- Create Reservation -->
         <mat-card class="create-card">
           <h2>Make New Reservation</h2>
-          
+
           <form (ngSubmit)="createReservation()">
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Your Name</mat-label>
               <input matInput [(ngModel)]="newReservation.customer_name" name="name" required>
             </mat-form-field>
 
+            <!-- DATE PICKER -->
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Date & Time</mat-label>
-              <input matInput type="datetime-local" [(ngModel)]="newReservation.reservation_time" name="datetime" required>
+              <mat-label>Date</mat-label>
+              <input
+                matInput
+                [matDatepicker]="picker"
+                [(ngModel)]="selectedDate"
+                name="date"
+                required>
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+
+            <!-- TIME PICKER -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Time</mat-label>
+              <input
+                matInput
+                type="time"
+                [(ngModel)]="selectedTime"
+                name="time"
+                required>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
@@ -215,9 +239,13 @@ import { Reservation } from '../../../models/user.model';
   `]
 })
 export class ReservationComponent implements OnInit {
+
   reservations: Reservation[] = [];
   loading = true;
-  
+
+  selectedDate!: Date;
+  selectedTime!: string;
+
   newReservation = {
     customer_name: '',
     reservation_time: '',
@@ -249,16 +277,24 @@ export class ReservationComponent implements OnInit {
   }
 
   createReservation() {
-    if (!this.newReservation.customer_name || !this.newReservation.reservation_time) {
+    if (!this.newReservation.customer_name || !this.selectedDate || !this.selectedTime) {
       this.snackBar.open('Please fill in all fields', 'Close', { duration: 3000 });
       return;
     }
+
+    const date = new Date(this.selectedDate);
+    const [hours, minutes] = this.selectedTime.split(':');
+    date.setHours(+hours, +minutes);
+
+    this.newReservation.reservation_time = date.toISOString();
 
     this.reservationService.createReservation(this.newReservation).subscribe({
       next: (response) => {
         if (response.success) {
           this.snackBar.open('Reservation created successfully!', 'Close', { duration: 3000 });
           this.newReservation = { customer_name: '', reservation_time: '', capacity: 2 };
+          this.selectedDate = undefined as any;
+          this.selectedTime = '';
           this.loadReservations();
         }
       },
@@ -278,7 +314,7 @@ export class ReservationComponent implements OnInit {
           this.loadReservations();
         }
       },
-      error: (error) => {
+      error: () => {
         this.snackBar.open('Failed to cancel reservation', 'Close', { duration: 3000 });
       }
     });

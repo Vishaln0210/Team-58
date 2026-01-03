@@ -2,19 +2,15 @@ import pool from './config/db';
 import bcrypt from 'bcryptjs';
 
 export const seedData = async () => {
-    try {
-        console.log('🌱 Seeding database with demo data...');
-    
-        const [existingTables]: any = await pool.query(
-          'SELECT COUNT(*) as count FROM restaurant_tables'
-        );
-    
-        if (existingTables[0].count > 0) {
-          console.log('✅ Tables already seeded, skipping...');
-          return;
-        }
+  try {
+    console.log('🌱 Seeding database with demo data...');
 
-    // Create demo users
+    const [existingUsers]: any = await pool.query('SELECT COUNT(*) as count FROM users');
+    if (existingUsers[0].count > 0) {
+      console.log('✅ Database already has data, skipping seed...');
+      return;
+    }
+
     const hashedPassword = await bcrypt.hash('password123', 10);
 
     // Insert customers
@@ -39,6 +35,12 @@ export const seedData = async () => {
       ['Restaurant Manager', 'manager@test.com', hashedPassword, 'manager', '+1987654321']
     );
 
+    // Insert admin
+    await pool.query(
+      'INSERT INTO users (name, email, password, role, contact_info) VALUES (?, ?, ?, ?, ?)',
+      ['System Admin', 'admin@test.com', hashedPassword, 'admin', '+1555555555']
+    );
+
     // Insert sample tables
     const tables = [
       { table_number: '1', capacity: 2, type: 'regular', status: 'available' },
@@ -60,7 +62,6 @@ export const seedData = async () => {
       );
     }
 
-    // Add some occupied tables with customer names
     await pool.query(
       `UPDATE restaurant_tables SET current_customer_name = 'Alice Brown' WHERE table_number = '2'`
     );
@@ -69,7 +70,6 @@ export const seedData = async () => {
       `UPDATE restaurant_tables SET current_customer_name = 'Charlie Wilson' WHERE table_number = '8'`
     );
 
-    // Add a reservation
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(19, 0, 0, 0);
@@ -83,7 +83,6 @@ export const seedData = async () => {
       [tomorrow]
     );
 
-    // Add people to queue
     await pool.query(
       `UPDATE restaurant_tables 
        SET queue_position = 1, 
@@ -105,6 +104,7 @@ export const seedData = async () => {
     console.log('📝 Demo Accounts:');
     console.log('   Customer: customer@test.com / password123');
     console.log('   Manager:  manager@test.com / password123');
+    console.log('   Admin:    admin@test.com / password123');
     console.log('');
   } catch (error) {
     console.error('❌ Error seeding data:', error);

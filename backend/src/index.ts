@@ -7,6 +7,7 @@ import authRoutes from './routes/auth.routes';
 import tableRoutes from './routes/table.routes';
 import queueRoutes from './routes/queue.routes';
 import reservationRoutes from './routes/reservation.routes';
+import adminRoutes from './routes/admin.routes';
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/tables', tableRoutes);
 app.use('/api/queue', queueRoutes);
 app.use('/api/reservations', reservationRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
@@ -41,7 +43,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 const startServer = async () => {
   try {
     await initDatabase();
-    await seedData(); // Seed demo data
+    await seedData();
     app.listen(PORT, () => {
       console.log(`🚀 Server running on http://localhost:${PORT}`);
       console.log(`📊 Database connected successfully`);

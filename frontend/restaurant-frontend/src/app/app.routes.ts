@@ -47,5 +47,19 @@ export const routes: Routes = [
     data: { role: 'manager' }
   },
   
+  // Admin Routes
+  { 
+    path: 'admin/dashboard', 
+    loadComponent: () => import('./components/admin/dashboard/dashboard.component').then(m => m.DashboardComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'admin' }
+  },
+  { 
+    path: 'admin/users', 
+    loadComponent: () => import('./components/admin/user-management/user-management.component').then(m => m.UserManagementComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'admin' }
+  },
+  
   { path: '**', redirectTo: '/login' }
 ];

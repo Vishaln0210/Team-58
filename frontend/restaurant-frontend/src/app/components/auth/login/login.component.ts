@@ -219,6 +219,11 @@ export class LoginComponent {
       this.router.navigate(['/manager/dashboard']).then(success => {
         console.log('Navigation success:', success);
       });
+    } else if (role === 'admin') {
+      console.log('Redirecting to admin dashboard...');
+      this.router.navigate(['/admin/dashboard']).then(success => {
+        console.log('Navigation success:', success);
+      });
     } else {
       console.error('Unknown role:', role);
       this.router.navigate(['/login']);
